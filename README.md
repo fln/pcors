@@ -30,3 +30,27 @@ func main() {
 	http.ListenAndServe(":8123", pcors.Default(http.DefaultServeMux))
 }
 ```
+
+Example with reponse header exposing:
+```go
+package main
+
+import (
+	"net/http"
+
+	"github.com/fln/pcors"
+)
+
+func main() {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-First", "first exposed")
+		w.Header().Set("X-Second", "second exposed")
+		w.Header().Set("X-Third", "not exposed")
+		w.Write([]byte("Hello world!"))
+	})
+	http.ListenAndServe(
+		":8123",
+		pcors.ExposeHeaders("X-First", "X-Second")(http.DefaultServeMux),
+	)
+}
+```
